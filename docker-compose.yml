@@ -1,0 +1,39 @@
+version: "3.7"
+services:
+  api_service:
+    build: ./backend/api-service
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql_db
+    environment:
+      - db_username=${MYSQL_USER}
+      - db_password=${MYSQL_PASSWORD}
+      - db_host=app_db
+    links:
+      - mysql_db:app_db
+  hello_world_service:
+    build: ./backend/hello-world-service
+    restart: always
+    environment:
+      - db_username=${MYSQL_USER}
+      - db_password=${MYSQL_PASSWORD}
+      - db_host=app_db
+      - server_port=8081
+    ports:
+      - 8081:8081
+    depends_on:
+      - mysql_db
+    links:
+      - mysql_db:app_db
+  mysql_db:
+    image: "mysql:8.0"
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
